@@ -1,0 +1,28 @@
+body {
+  background: url('https://hookagency.com/wp-content/uploads/2015/11/black-chrome-gradient-ui-gradient-background.jpg') no-repeat center center fixed;
+  background-size: cover;
+  font-family: 'Arial', sans-serif;
+  color: #fff;
+}
+
+
+h1 {
+  color: rgb(255, 255, 255);
+}
+
+.card {
+  background: #333;
+  border-radius: 15px;
+}
+
+.form-control, .btn {
+  border-radius: 15px;
+}
+
+#map {
+  height: 500px;
+}
+
+.fixed-bottom {
+  margin-bottom: 20px;
+}
