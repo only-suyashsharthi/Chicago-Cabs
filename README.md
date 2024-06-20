@@ -79,25 +79,6 @@ To set up this project locally, follow these steps:
   - Method: POST
   - Payload: JSON with keys pickup_lat, pickup_lon, dropoff_lat, dropoff_lon, company, and payment_type.
 
-## File Structure
-
-Chicago-Cabs/
-├── app.py
-├── requirements.txt
-├── templates/
-│ ├── index.html
-│ ├── dashboard.html
-├── static/
-│ ├── css/
-│ │ └── styles.css
-│ └── js/
-│ └── script.js
-├── models/
-│ ├── puca.pkl
-│ ├── doca.pkl
-│ └── fare_model.pkl
-└── config.py
-
 ## Dependencies
 
 - Flask
