@@ -1,5 +1,38 @@
 var map, pickupMarker, dropoffMarker;
 
+function autoSelectBestOption() {
+    if (!pickupMarker || !dropoffMarker) return;
+
+    var pickupLat = pickupMarker.getPosition().lat();
+    var pickupLng = pickupMarker.getPosition().lng();
+    var dropoffLat = dropoffMarker.getPosition().lat();
+    var dropoffLng = dropoffMarker.getPosition().lng();
+
+    $.ajax({
+        url: '/predict',
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({
+            pickup_lat: pickupLat,
+            pickup_lon: pickupLng,
+            dropoff_lat: dropoffLat,
+            dropoff_lon: dropoffLng
+        }),
+        success: function(response) {
+            $('#fare').text(response.fare);
+            $('#travel-time').text(response.travel_time);
+
+            // auto-select in dropdowns
+            $('#company').val(response.best_company);
+            $('#payment-type').val(response.best_payment);
+        },
+        error: function(error) {
+            console.error(error);
+        }
+    });
+}
+
+
 function initMap() {
     var chicago = { lat: 41.8781, lng: -87.9 };
     map = new google.maps.Map(document.getElementById('map'), {
@@ -26,6 +59,7 @@ function initMap() {
             position: place.geometry.location,
             icon: 'http://maps.google.com/mapfiles/ms/icons/green-dot.png'
         });
+        autoSelectBestOption();
     });
 
     var inputDropoff = document.getElementById('dropoff-location');
@@ -47,6 +81,7 @@ function initMap() {
             position: place.geometry.location,
             icon: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png'
         });
+        autoSelectBestOption();
     });
 }
 

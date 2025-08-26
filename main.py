@@ -32,8 +32,8 @@ def predict():
     pickup_lon = data['pickup_lon']
     dropoff_lat = data['dropoff_lat']
     dropoff_lon = data['dropoff_lon']
-    company = data['company']
-    payment_type = data['payment_type']
+    company = data.get('company')
+    payment_type = data.get('payment_type')
 
     trip_miles = haversine((pickup_lat, pickup_lon), (dropoff_lat, dropoff_lon))
     pickup_community_area = puca_model.predict([[pickup_lat, pickup_lon]])[0]
@@ -41,28 +41,41 @@ def predict():
     trip_minutes = trip_miles / 0.512
     trip_start_hour = datetime.datetime.now().hour
     trip_start_day = datetime.datetime.now().weekday()
-    
-    input_features = [[
-        trip_miles, 
-        pickup_community_area, 
-        dropoff_community_area, 
-        trip_minutes, 
-        trip_start_hour, 
-        trip_start_day, 
-        company_mapping[company], 
-        0, 
-        0, 
-        0, 
-        payment_type_mapping[payment_type]
-    ]]
 
-    fare = fare_model.predict(input_features)[0]
-    travel_time = trip_minutes
+    def predict_fare(c, p):
+        input_features = [[
+            trip_miles, pickup_community_area, dropoff_community_area,
+            trip_minutes, trip_start_hour, trip_start_day,
+            company_mapping[c], 0, 0, 0, payment_type_mapping[p]
+        ]]
+        fare = fare_model.predict(input_features)[0]
+        return fare
 
+    # If company/payment are not sent → calculate best combo
+    if not company or not payment_type:
+        best_fare = float("inf")
+        best_combo = None
+        for c in company_mapping.keys():
+            for p in ["Credit Card", "Mobile", "Cash"]:
+                fare = predict_fare(c, p)
+                if fare < best_fare:
+                    best_fare = fare
+                    best_combo = (c, p)
+
+        return jsonify({
+            'fare': round(best_fare, 2),
+            'travel_time': round(trip_minutes, 2),
+            'best_company': best_combo[0],
+            'best_payment': best_combo[1]
+        })
+
+    # Otherwise → calculate for given choice
+    fare = predict_fare(company, payment_type)
     return jsonify({
         'fare': round(fare, 2),
-        'travel_time': round(travel_time, 2)
+        'travel_time': round(trip_minutes, 2)
     })
+
 
 @app.route('/dashboard')
 def dashboard():
