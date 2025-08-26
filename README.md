@@ -69,7 +69,7 @@ flask run
 
 ```text
 Chicago-Cabs/
-├── app.py                 # Flask app entry point (use main.py if you renamed)
+├── main.py                 
 ├── requirements.txt       # Dependencies
 ├── templates/
 │   ├── index.html         # Homepage
